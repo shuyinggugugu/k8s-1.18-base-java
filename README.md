@@ -16,7 +16,8 @@ prometheus（已写入支持traefik指标的job）\
 grafana（grafana修改为ssl模式，如果不需要请直接原版的清单，其实完全可以用traefik暴露时ssl）\
 kafka-manager
 
-#引用，kafka集群使用的是\
+#引用 \
+kafka集群原出处 \
 https://github.com/Yolean/kubernetes-kafka \
-使用的备份还原脚本\
+使用的备份还原脚本原出处 \
 http://blog.csdn.net/ygqygq2
