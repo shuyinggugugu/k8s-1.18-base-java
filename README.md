@@ -1,4 +1,4 @@
-# 自用k8s-1.18基础环境搭建+java应用环境
+# 自用高可用k8s-1.18基础环境搭建+java应用环境+备份脚本
 # 基础环境包含
 环境初始化bash脚本（使用阿里云的镜像资源）\
 calico网络插件\
@@ -18,3 +18,5 @@ kafka-manager
 
 #引用，kafka集群使用的是\
 https://github.com/Yolean/kubernetes-kafka 
+使用的备份还原脚本
+http://blog.csdn.net/ygqygq2
