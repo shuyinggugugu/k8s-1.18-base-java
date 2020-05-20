@@ -3,7 +3,7 @@
 环境初始化bash脚本（使用阿里云的镜像资源）\
 calico网络插件\
 带管理权限的dashboard\
-Metrics Server\
+Metrics Server \
 # 拓展资源清单包含
 kafka集群\
 单点redis\
