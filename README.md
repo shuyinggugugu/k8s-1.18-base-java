@@ -10,7 +10,8 @@ kafka集群\
 traefik2.2.1（启用了带basicAuth加密的控制台）\
 单点EFK7.5.2（带X-PACK）\
 前端静态文件使用的nginx（NFS挂载模式，生产建议直接把静态文件也打成镜像，这里不应该暴露业务内容）
-# 使用helm部署的nfs-client-provisioner
+# 使用helm部署
+nfs-client-provisioner \
 prometheus（已写入支持traefik指标的job）\
 grafana（grafana修改为ssl模式，如果不需要请直接原版的清单，其实完全可以用traefik暴露时ssl）\
 kafka-manager
