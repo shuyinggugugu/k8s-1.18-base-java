@@ -17,6 +17,6 @@ grafana（grafana修改为ssl模式，如果不需要请直接原版的清单，
 kafka-manager
 
 #引用，kafka集群使用的是\
-https://github.com/Yolean/kubernetes-kafka 
-使用的备份还原脚本
+https://github.com/Yolean/kubernetes-kafka \
+使用的备份还原脚本\
 http://blog.csdn.net/ygqygq2
