@@ -1,0 +1,108 @@
+apiVersion: v1
+data:
+  elasticsearch.yml: |-
+    #cluster.name: "elasticsearch-0"
+    network.host: 0.0.0.0
+    http.cors.enabled: true
+    http.cors.allow-origin: "*"
+    path.logs: /usr/share/elasticsearch/logs
+    xpack.security.enabled: true
+    xpack.security.transport.ssl.enabled: true
+    #discovery.seed_hosts: ["127.0.0.1", "[::1]"]
+    cluster.initial_master_nodes: ["elasticsearch-0"]
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: elasticsearch
+  namespace: elk
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch
+  namespace: elk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  serviceName: "elasticsearch"
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - name: elasticsearch
+        image: elasticsearch:7.5.2
+        ports:
+        - containerPort: 9200
+          name: client
+        - containerPort: 9300
+          name: server
+        volumeMounts:
+        - name: yaml
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+        - name: data
+          mountPath: /usr/share/elasticsearch/data
+        - name: date-config
+          mountPath: /etc/localtime
+        livenessProbe:
+          exec:
+            command: ["cat","/etc/hosts"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          tcpSocket:
+            port: 9200
+          initialDelaySeconds: 5
+          periodSeconds: 3
+      volumes:
+      - name: yaml
+        configMap:
+          name: elasticsearch
+      - name: date-config
+        hostPath:
+          path: /etc/localtime
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: nfs-client
+      resources:
+        requests:
+          storage: 1000Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: elk
+spec:
+  ports:
+  - port: 9200
+    name: elasticsearch
+  - port: 9300
+    name: cs
+  clusterIP: None
+  selector:
+    app: elasticsearch
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elk
+  namespace: elk
+spec:
+  ports:
+  - port: 9200
+    name: elk
+    nodePort: 30092
+  selector:
+    app: elasticsearch
+  type: NodePort

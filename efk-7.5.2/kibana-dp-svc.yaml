@@ -1,0 +1,77 @@
+apiVersion: v1
+data:
+  kibana.yml: "#\n# ** THIS IS AN AUTO-GENERATED FILE **\n#\n\n# Default Kibana configuration
+    for docker target\nserver.name: kibana\nserver.host: \"0.0.0.0\"\nelasticsearch.hosts:
+    [ \"http://elasticsearch:9200\" ]\nxpack.monitoring.ui.container.elasticsearch.enabled:
+    true\ni18n.locale: \"zh-CN\"\nelasticsearch.username: \"kibana\"\nelasticsearch.password:
+    \"EDWxOYdhWPrcXksrJX7B\"\nserver.ssl.certificate: \"config/ssl/tls.crt\" \nserver.ssl.key:
+    \"config/ssl/tls.key\"\nserver.ssl.enabled: true\n"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: kibana
+  namespace: elk
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: elk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: kibana:7.5.2
+        ports:
+        - containerPort: 5601
+        volumeMounts:
+        - name: yaml
+          mountPath: /usr/share/kibana/config/kibana.yml
+          subPath: kibana.yml
+        - name: ssl
+          mountPath: /usr/share/kibana/config/ssl
+        - name: date-config
+          mountPath: /etc/localtime
+        livenessProbe:
+          exec:
+            command: ["cat","/etc/hosts"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        readinessProbe:
+          tcpSocket:
+            port: 5601
+          initialDelaySeconds: 5
+          periodSeconds: 3
+      volumes:
+      - name: yaml
+        configMap:
+          name: kibana
+      - name: ssl
+        secret:
+          secretName: kibana
+      - name: date-config
+        hostPath:
+          path: /etc/localtime
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: elk
+spec:
+  ports:
+  - port: 5601
+    name: kibana
+    nodePort: 30561
+  selector:
+    app: kibana
+  type: NodePort
