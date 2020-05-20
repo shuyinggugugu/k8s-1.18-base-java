@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: centos7 
+  namespace: default
+spec:
+  containers:
+  - name: centos7
+    image: centos:7
+    imagePullPolicy: IfNotPresent
+    command:
+      - sleep
+      - "36000"
+#    volumeMounts:
+#      - name: jssm200-admin
+#        mountPath: /tmp
+#  volumes:
+#    - name: jssm200-admin
+#      configMap:
+#        name: jssm200-admin 
