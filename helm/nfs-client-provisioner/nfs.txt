@@ -1,0 +1,1 @@
+helm install -n nfs stable/nfs-client-provisioner --set nfs.server=tf203 --set nfs.path=/data/nfs/test

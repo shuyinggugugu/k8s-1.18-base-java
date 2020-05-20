@@ -1,0 +1,18 @@
+kind: ConfigMap
+metadata:
+  name: traefik-config
+  namespace: traefik
+apiVersion: v1
+data:
+  conf.toml: |
+    [http.routers.my-api]
+      rule = "Host(`traefik.zlsgs.cn`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      service = "api@internal"
+      middlewares = ["auth"]
+    
+    [http.middlewares.auth.basicAuth]
+      users = [
+        "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/",
+        "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0",
+        "admin:$apr1$hru4sb7d$K3zQWf6fZEfjzrA6HYmLi0",
+      ]    

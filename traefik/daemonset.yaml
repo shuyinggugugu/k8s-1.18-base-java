@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: traefik
+  name: traefik-ingress-controller
+
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  namespace: traefik
+  name: traefik
+  labels:
+    app: traefik
+spec:
+# replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      hostNetwork: true
+      serviceAccountName: traefik-ingress-controller
+      containers:
+        - name: traefik
+          image: traefik:v2.2.1
+#          env:   
+#          - name: ALICLOUD_ACCESS_KEY
+#            value: 
+#          - name: ALICLOUD_SECRET_KEY
+#            value: 
+          args:
+#            - --api.insecure
+#            - --api=true
+            - --api.dashboard=true
+            - --serversTransport.insecureSkipVerify=true
+            - --accesslog
+            - --entrypoints.web.Address=:80
+            - --entryPoints.redis.address=:16379
+            - --entryPoints.zookeeper.address=:12181
+#            - --entrypoints.ls.Address=:12888
+            - --entrypoints.websecure.Address=:443
+            - --metrics=true
+            - --metrics.prometheus=true
+            - --metrics.prometheus.addEntryPointsLabels=true
+            - --metrics.prometheus.addServicesLabels=true
+#            - --entrypoints.metrics.Address=:8082
+#            - --metrics.prometheus.entryPoint=metrics
+            - --entrypoints.traefik.Address=:9000
+            - --providers.kubernetescrd
+            - --tracing=true
+            - --tracing.elastic=true
+            - --tracing.elastic.serverurl=http://192.168.85.211:30082
+            - --tracing.elastic.serviceenvironment="production"
+            - --providers.file.filename=/etc/config/conf.toml
+#            - --certificatesresolvers.beta.acme.tlschallenge=true
+#            - --certificatesresolvers.beta.acme.tlschallenge.entrypoint=websecure
+#            - --certificatesresolvers.beta.acme.httpchallenge=true
+ #           - --certificatesresolvers.beta.acme.httpchallenge.entrypoint=web
+#            - --certificatesresolvers.beta.acme.storage=acme.json
+#            - --certificatesresolvers.beta.acme.dnschallenge=true
+#            - --certificatesresolvers.beta.acme.dnschallenge.provider=alidns
+#            - --certificatesresolvers.beta.acme.dnschallenge.provider=dnspod
+#            - --certificatesresolvers.beta.acme.dnschallenge.delaybeforecheck=0
+#            - --certificatesresolvers.beta.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+            # Please note that this is the staging Let's Encrypt server.
+            # Once you get things working, you should remove that whole line altogether.
+          volumeMounts:
+            - name: conf
+              mountPath: /etc/config/
+#              mountPath: /etc/config/conf.toml
+#              subPath: conf.toml            
+          ports:
+            - name: web
+              containerPort: 80
+            - name: websecure
+              containerPort: 443
+            - name: admin
+              containerPort: 9000
+            - name: metrics
+              containerPort: 8082
+ #           - name: ls
+ #             containerPort: 12888
+      volumes:
+        - name: conf
+          configMap:
+            name: traefik-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+  namespace: traefik
+spec:
+  ports:
+    - protocol: TCP
+      name: web
+      port: 80
+    - protocol: TCP
+      name: admin
+      port: 9000
+    - protocol: TCP
+      name: websecure
+      port: 443
+    - name: metrics
+      port: 8082  
+  selector:
+    app: traefik
