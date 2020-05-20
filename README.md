@@ -20,9 +20,9 @@ kafka-manager
 kafka集群原出处 \
 https://github.com/Yolean/kubernetes-kafka \
 使用的备份还原脚本原出处 \
-http://blog.csdn.net/ygqygq2
+http://blog.csdn.net/ygqygq2 \
 修改证书年限，如果不修改默认有效期为1年 \
-https://www.cnblogs.com/2019peng/p/11988424.html
+https://www.cnblogs.com/2019peng/p/11988424.html \
 生成不过期token \
 kubeadm token create --ttl 0 \
 查看证书有效期 \
