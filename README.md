@@ -28,7 +28,7 @@ kubeadm token create --ttl 0 \
 查看证书有效期 \
 kubeadm alpha certs check-expiration \
 查看证书 \
-openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //' \
 上传证书 \
 kubeadm init phase upload-certs --upload-certs \
 去除主节点的污点 \
