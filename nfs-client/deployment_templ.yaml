@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: NFS_STORAGE_CLASS-nfs-client-provisioner
+  labels:
+    app: NFS_STORAGE_CLASS-nfs-client-provisioner
+  # replace with namespace where provisioner is deployed
+  namespace: default
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: NFS_STORAGE_CLASS-nfs-client-provisioner
+  template:
+    metadata:
+      labels:
+        app: NFS_STORAGE_CLASS-nfs-client-provisioner
+    spec:
+      serviceAccountName: nfs-client-provisioner
+      containers:
+        - name: NFS_STORAGE_CLASS-nfs-client-provisioner
+          image: registry.cn-shenzhen.aliyuncs.com/jssm_base/nfs-client-provisioner:v3.1.0-k8s1.11
+          volumeMounts:
+            - name: nfs-client-root
+              mountPath: /persistentvolumes
+          env:
+            - name: PROVISIONER_NAME
+              value: NFS_STORAGE_CLASS
+            - name: NFS_SERVER
+              value: NFS_SERVER_IP 
+            - name: NFS_PATH
+              value: NFS_SERVER_PATH 
+      volumes:
+        - name: nfs-client-root
+          nfs:
+            server: NFS_SERVER_IP 
+            path: NFS_SERVER_PATH
